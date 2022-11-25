@@ -1,0 +1,92 @@
+body * {
+  font-size: 16px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+button {
+  padding: 20px;
+  margin: 10px;
+  background: rgb(24, 121, 248);
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  width: 50%;
+  font-size: 30px;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul li {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  padding: 2em 4em;
+}
+
+.timer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+}
+
+.timer {
+  border-radius: 50%;
+  border: 3px solid rgb(143, 143, 143);
+  padding: 30px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  color: rgb(3, 117, 248);
+  font-weight: bold;
+  font-size: 38px;
+}
+
+.question {
+  font-size: 55px;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px 20px;
+}
+
+.correct {
+  background: green;
+  color: white;
+}
+
+.default {
+  background: rgb(24, 121, 248);
+  color: white;
+}
+
+.disabled {
+  background: rgb(121, 121, 121);
+  color: white;
+}
+.answer-text {
+  font-size: 30px;
+  text-align: center;
+}
+
+.answer-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.user-badge {
+
+  padding: 5px;
+  margin: 0 10px;
+  width: 20px;
+  height: 20px;
+  background-color: rgb(253, 184, 80);
+  border-radius: 50%;
+}

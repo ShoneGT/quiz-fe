@@ -1,91 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import React, {useEffect, useState} from 'react';
+import questionsData from '../data/questions.json';
+// import answersData from './data/answers.json';
+import { CircularProgress, CircularProgressLabel } from '@chakra-ui/react'
 
-const server = 'http://localhost:3009'
+import './quiz.style.css';
 
-const socket = io(server);
+const Quiz = () => {
+    const [questions, setQuestions] = useState([]);
+    const [answers, setAnswers] = useState([]);
+    const [timer, setTimer] = useState(10);
+    const [disabled, setDisabled] = useState(false);
 
-function Quizz() {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [lastPong, setLastPong] = useState(null);
-  const [questions, setQuestions] = useState([])
-  const [answers, setAnswers] = useState([])
+    const [currentQuestion, setCurrentQuestion] = useState(0);
 
-  useEffect(() => {
-    socket.on('connect', (a) => {
-      console.log(a);
-      setIsConnected(true);
-    });
+    useEffect(() => {
+        console.log(questionsData)
+        setQuestions(questionsData);
 
-    socket.on('disconnect', () => {
-      setIsConnected(false);
-    });
+        let time = 3;
+        const interval = setInterval(() => {
+            time -= 1;
+            if (time > -1) {
+                setTimer(time);
+            } else {
+                clearInterval(interval);
+                setDisabled(true);
+                setCurrentQuestion(currentQuestion + 1)
+                resetValues()
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
-    socket.on('pong', () => {
-      setLastPong(new Date().toISOString());
-    });
+    const answer = (answer) => {
+        answer.userAnswered = true;
 
-    socket.on('findAllQuiz', response =>
-      {
-        console.log('Quizzz:', response)
-        setQuestions(response.questions)
-        setAnswers(response.answers)
-
-      }
-    );
-
-    socket.emit('findAllQuiz', 0, response =>
-      {
-        console.log('Quizzz:', response)
-        setQuestions(response.questions)
-        setAnswers(response.answers)
-
-      }
-    );
-    return () => {
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('pong');
+        setDisabled(true);
+        setAnswers([...answers]);
     };
-  }, []);
 
-  
-  const sendAnswer = (answer) => {
-    socket.emit('updateQuiz', {answer})
-  }
+    const resetValues = () => {
+        setDisabled(false)
+        setTimer(10)
+    }
+    return (
+        <div className="container">
+            {/*<CircularProgress value={80} />*/}
+            <div className="timer-wrapper">
+                <div className="timer">{timer}</div>
+            </div>
+            <div>
+                <h1 className="question">{questions[currentQuestion]?.question}</h1>
+            </div>
+            <ul>
+                {questions[currentQuestion]?.answers.map((a) => {
+                    return (
+                        <li className="list">
+                            <button
+                                onClick={() => answer(a)}
+                                className={` ${a.correct && disabled ? 'correct' : ''}
+                                ${disabled && !a.correct ? 'disabled' : ''}
+                                `}
+                                disabled={disabled}
+                            >
+                                <div className="answer-wrapper">
+                                    {a.userAnswered && <div className="user-badge"></div>}
+                                    <div className="answer-text">{a.answer}</div>
+                                </div>
+                            </button>
+                        </li>
+                    );
+                })}
+            </ul>
+        </div>
+    );
+};
 
-  const sendPing = () => {
-    socket.emit('ping');
-  }
-
-  return (
-    <div>
-      <p>Connected: { '' + isConnected }</p>
-      {/* <p>Last pong: { lastPong || '-' }</p> */}
-      <p> Questions:</p>
-      <div>
-        {questions.map(q => (
-          <div key={q.id}>
-            <p>{q.id}: {q.question}</p>
-            
-          </div>
-        ))}
-      </div>
-      <hr />
-      <p>Answers: </p>
-      <div>
-        {answers.map((q, index) => (
-          <div key={index}>
-            <p>{q.answer}</p>
-            
-          </div>
-        ))}
-      </div>
-      <hr />
-      <button onClick={() => sendAnswer('2022')}>Answer 1</button>
-      <button onClick={() => sendAnswer('2024')}>Answer 2</button>
-    </div>
-  );
-}
-
-export default Quizz;
+export default Quiz;
